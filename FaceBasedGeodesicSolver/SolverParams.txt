@@ -1,0 +1,29 @@
+#### Parameters for geodeisc distance solver #####
+#### Lines starting with '#' are comments ########
+
+## Maximum number of iterations for the Gauss-Seidel heat solver, must be positive.
+HeatSolverMaxIter   1000
+
+## Relative convergence threshold for the heat solver, must be positive.
+HeatSolverEps  1e-6
+
+## Convergence check frequency for the heat solver, must be positive.
+HeatSolverConvergeCheckFrequency  50
+
+## Maximum number of iterations for the gradient solver, must be positive.
+GradSolverMaxIter  1000
+
+## Relative convergence threshold for the gradient solver, must be positive.
+GradSolverEps  1e-5
+
+## Penalty parameter for the gradient solver, must be positive
+Penalty  10
+
+## Convergence check frequency for the gradient solver, must be positive.
+GradSolverConvergeCheckFrequency  50
+
+## Output frequency for the gradient solver, should be a multiple of GradSolverConvergeCheckFrequency.
+GradSolverOutputFrequency  50
+
+## List of source vertices, separated by whitespace; must be non-negative
+SourceVertices  0
