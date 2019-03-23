@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2017, Bailin Deng
+// Copyright (c) 2019, Jiong Tao, Bailin Deng, Yue Peng
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,41 +28,58 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EIGENTYPES_H
-#define EIGENTYPES_H
 
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
-#include <Eigen/SparseCore>
+#include "FaceBasedGeodesicSolver.h"
+#include "EdgeBasedGeodesicSolver.h"
+#include "DistanceFile.h"
+#include "GetRSS.h"
+#include <iostream>
 
-// Define eigen matrix types
-typedef Eigen::Matrix<double, 3, Eigen::Dynamic> Matrix3X;
-typedef Eigen::Matrix<double, 2, Eigen::Dynamic> Matrix2X;
-typedef Eigen::Matrix<int, 2, Eigen::Dynamic> Matrix2Xi;
-typedef Eigen::Matrix<double, Eigen::Dynamic, 3> MatrixX3;
-typedef Eigen::Matrix<double, Eigen::Dynamic, 2> MatrixX2;
-typedef Eigen::Matrix<double, 3, 2> Matrix32;
-typedef Eigen::Matrix<int, 3, Eigen::Dynamic> Matrix3Xi;
-typedef Eigen::VectorXd DenseVector;
-typedef Eigen::VectorXi IndexVector;
-typedef Eigen::Vector2i IndexPair;
-typedef Eigen::Matrix<bool, Eigen::Dynamic, 1> BoolVector;
+int main(int argc, char* argv[]) {
+  if (argc != 4) {
+    std::cerr << "Usage: GeodDistSolver PARAMETERS_FILE MESH_FILE DISTANCE_FILE"
+              << std::endl;
+    return 1;
+  }
 
+  Parameters param;
+  if (!param.load(argv[1])) {
+    std::cerr << "Error: unable to load parameter file" << std::endl;
+    return 1;
+  }
+  param.output_options();
 
-// Conversion between a 3d vector type to Eigen::Vector3d
-template<typename Vec_T>
-inline Eigen::Vector3d to_eigen_vec3d(const Vec_T &vec) {
-  return Eigen::Vector3d(vec[0], vec[1], vec[2]);
+  if (param.solver_type == 0) {
+    FaceBasedGeodesicSolver FaceBasedSolver;
+    if (!FaceBasedSolver.solve(argv[2], param)) {
+      std::cerr
+          << "Error in solving geodesic distance by using Face Based Geodesic Distance Solver"
+          << std::endl;
+      return 1;
+    }
+
+    if (!DistanceFile::save(argv[3], FaceBasedSolver.get_distance_values())) {
+      std::cerr << "Error in saving geodesic distance" << std::endl;
+      return 1;
+    }
+  } else {
+    EdgeBasedGeodesicSolver EdgeBasedSolver;
+    if (!EdgeBasedSolver.solve(argv[2], param)) {
+      std::cerr
+          << "Error in solving geodesic distance by using Edge Based Geodesic Distance Solver"
+          << std::endl;
+      return 1;
+    }
+
+    if (!DistanceFile::save(argv[3], EdgeBasedSolver.get_distance_values())) {
+      std::cerr << "Error in saving geodesic distance" << std::endl;
+      return 1;
+    }
+  }
+
+  size_t peak_mem = getPeakRSS();
+  std::cout << "Peak memory usage in bytes: " << peak_mem << std::endl;
+
+  return 0;
 }
 
-template<typename Vec_T>
-inline Vec_T from_eigen_vec3d(const Eigen::Vector3d &vec) {
-  Vec_T v;
-  v[0] = vec(0);
-  v[1] = vec(1);
-  v[2] = vec(2);
-
-  return v;
-}
-
-#endif // EIGENTYPES_H

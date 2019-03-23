@@ -26,7 +26,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 	target_compile_options(SurfaceMesh PUBLIC -pedantic -Wno-long-long)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("GNU compiler found.")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -mtune=native")
 	target_compile_options(SurfaceMesh PUBLIC -pedantic -Wno-long-long)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -44,9 +44,11 @@ add_executable(GeodDistSolver
 	EigenTypes.h
 	OMPHelper.h
 	Parameters.h
-	GeodesicDistanceSolver.h
+	FaceBasedGeodesicSolver.h
+	EdgeBasedGeodesicSolver.h
 	DistanceFile.h
-	GeodesicDistanceSolver.cpp
+	FaceBasedGeodesicSolver.cpp
+	EdgeBasedGeodesicSolver.cpp
 	Parameters.cpp
 	ComputeDistance.cpp
 )

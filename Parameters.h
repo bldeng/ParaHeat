@@ -1,6 +1,6 @@
 // BSD 3-Clause License
 //
-// Copyright (c) 2017, Bailin Deng
+// Copyright (c) 2019, Jiong Tao, Bailin Deng, Yue Peng
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,38 +28,52 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EIGENTYPES_H
-#define EIGENTYPES_H
 
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
+#ifndef PARAMETERS_H_
+#define PARAMETERS_H_
 
-// Define eigen matrix types
-typedef Eigen::Matrix<double, 3, Eigen::Dynamic> Matrix3X;
-typedef Eigen::Matrix<double, 2, Eigen::Dynamic> Matrix2X;
-typedef Eigen::Matrix<int, 2, Eigen::Dynamic> Matrix2Xi;
-typedef Eigen::Matrix<double, Eigen::Dynamic, 3> MatrixX3;
-typedef Eigen::Matrix<double, Eigen::Dynamic, 2> MatrixX2;
-typedef Eigen::Matrix<double, 3, 2> Matrix32;
-typedef Eigen::Matrix<int, 3, Eigen::Dynamic> Matrix3Xi;
-typedef Eigen::VectorXd DenseVector;
-typedef Eigen::VectorXi IndexVector;
-typedef Eigen::Vector2i IndexPair;
+#include <vector>
 
-// Conversion between a 3d vector type to Eigen::Vector3d
-template<typename Vec_T>
-inline Eigen::Vector3d to_eigen_vec3d(const Vec_T &vec) {
-  return Eigen::Vector3d(vec[0], vec[1], vec[2]);
-}
+struct Parameters {
+  Parameters()
+      : heat_solver_max_iter(500),
+        heat_solver_eps(1e-8),
+        heat_solver_convergence_check_frequency(10),
+        grad_solver_max_iter(500),
+        grad_solver_eps(1e-4),
+        penalty(50),
+        grad_solver_output_frequency(50),
+        grad_solver_convergence_check_frequency(10),
+        solver_type(0) {
+    source_vertices.push_back(0);
+  }
 
-template<typename Vec_T>
-inline Vec_T from_eigen_vec3d(const Eigen::Vector3d &vec) {
-  Vec_T v;
-  v[0] = vec(0);
-  v[1] = vec(1);
-  v[2] = vec(2);
+  // Parameters for heat solver
+  int heat_solver_max_iter;
+  double heat_solver_eps;
+  int heat_solver_convergence_check_frequency;
 
-  return v;
-}
+  // Parameters for the ADMM solver for gradient correction
+  int grad_solver_max_iter;
+  double grad_solver_eps;
+  double penalty;
+  int grad_solver_output_frequency;
+  int grad_solver_convergence_check_frequency;
 
-#endif // EIGENTYPES_H
+  // Indices for source vertices
+  std::vector<int> source_vertices;
+
+  // SolverType. 0 for face based algorithm; 1 for edge based algorithm
+  int solver_type;
+
+  // Load options from file
+  bool load(const char* filename);
+
+  // Check whether the parameter values are valid
+  bool valid_parameters() const;
+
+  // Print options
+  void output_options();
+};
+
+#endif /* PARAMETERS_H_ */

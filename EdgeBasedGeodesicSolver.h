@@ -1,13 +1,45 @@
-#ifndef GEODESICDISTANCESOLVER_H_
-#define GEODESICDISTANCESOLVER_H_
+// BSD 3-Clause License
+//
+// Copyright (c) 2019, Jiong Tao, Bailin Deng, Yue Peng
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+//
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+//
+// * Neither the name of the copyright holder nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+#ifndef EDGEBASEDGEODESICSOLVER_H_
+#define EDGEBASEDGEODESICSOLVER_H_
 
 #include "EigenTypes.h"
 #include "surface_mesh/Surface_mesh.h"
 #include "Parameters.h"
 
-class GeodesicDistanceSolver {
+class EdgeBasedGeodesicSolver {
  public:
-  GeodesicDistanceSolver();
+  EdgeBasedGeodesicSolver();
 
   bool solve(const char* mesh_file, const Parameters &para);
 
@@ -26,7 +58,7 @@ class GeodesicDistanceSolver {
   IndexVector bfs_vertex_list;  // Non-source vertex indices stored according to their BFS order
   IndexVector bfs_segment_addr;  // Addresses within bfs_vertex_list for the first vertex in each BFS layer
 
-  std::pair<int, double>* bfs_laplacian_coef; // Vertices and their weights for evaluating cotan Laplacian
+  std::pair<int, double>* bfs_laplacian_coef;  // Vertices and their weights for evaluating cotan Laplacian
   IndexVector bfs_laplacian_coef_addr;  // Starting addresses for the segment of each Laplacian within bfs_laplacian_vtx
 
   //
@@ -35,9 +67,9 @@ class GeodesicDistanceSolver {
   DenseVector Y;  // Paper: Y  auxiliary variable
   DenseVector D;  // Paper: D  scaled dual variable
 
-  Matrix3Xi  S;   // Paper: S  selection matrix, each column storing the three indices associated with an face
-  Matrix3Xi  Q;   // paper: Q  orientation matrix, each column storing the three indices (-1 or 1)
-  Matrix2Xi  edges_Y_index; // the set of rows in Vector Y that corresponding to each edge
+  Matrix3Xi S;  // Paper: S  selection matrix, each column storing the three indices associated with an face
+  Matrix3Xi Q;  // paper: Q  orientation matrix, each column storing the three indices (-1 or 1)
+  Matrix2Xi edges_Y_index;  // the set of rows in Vector Y that corresponding to each edge
 
   DenseVector SX1, SX2;  // Storage for S * X
   DenseVector *current_SX, *prev_SX;  // Pointer to current and previous S * X buffers.
@@ -60,7 +92,6 @@ class GeodesicDistanceSolver {
   int n_edges;            // number of edges
   int n_halfedges;        // number of halfedges;
   int n_interior_edges;            // number of interior edges
-  
 
   int iter_num;
 
@@ -83,13 +114,15 @@ class GeodesicDistanceSolver {
 
   void update_Y();                          // update Y
   void update_X();                          // update X
-  void update_dual_variables(); // update dual variables and check if the solver converges
+  void update_dual_variables();  // update dual variables and check if the solver converges
 
   typedef long double HeatScalar;
   typedef Eigen::Matrix<HeatScalar, Eigen::Dynamic, 1> VectorHS;
   typedef Eigen::Matrix<HeatScalar, 3, 1> Vector3HS;
   typedef Eigen::Matrix<HeatScalar, 3, 3> Matrix3HS;
-  void compute_heatflow_residual(const VectorHS &heat_values, HeatScalar init_source_val, VectorHS &residuals);
+  void compute_heatflow_residual(const VectorHS &heat_values,
+                                 HeatScalar init_source_val,
+                                 VectorHS &residuals);
 };
 
 #endif /* GEODESICDISTANCESOLVER_H_ */

@@ -1,3 +1,34 @@
+// BSD 3-Clause License
+//
+// Copyright (c) 2019, Jiong Tao, Bailin Deng, Yue Peng
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+//
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+//
+// * Neither the name of the copyright holder nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 #include "Parameters.h"
 #include <fstream>
 #include <iostream>
@@ -142,19 +173,23 @@ bool Parameters::load(const char* filename) {
 
     if (!(opt.load_value("HeatSolverMaxIter", heat_solver_max_iter)
         || opt.load_value("HeatSolverEps", heat_solver_eps)
-        || opt.load_value("HeatSolverConvergeCheckFrequency", heat_solver_convergence_check_frequency)
+        || opt.load_value("HeatSolverConvergeCheckFrequency",
+                          heat_solver_convergence_check_frequency)
         || opt.load_value("GradSolverMaxIter", grad_solver_max_iter)
         || opt.load_value("GradSolverEps", grad_solver_eps)
         || opt.load_value("Penalty", penalty)
-        || opt.load_value("GradSolverOutputFrequency", grad_solver_output_frequency)
-        || opt.load_value("GradSolverConvergeCheckFrequency", grad_solver_convergence_check_frequency)
-        || opt.load_values("SourceVertices", source_vertices))) {
+        || opt.load_value("GradSolverOutputFrequency",
+                          grad_solver_output_frequency)
+        || opt.load_value("GradSolverConvergeCheckFrequency",
+                          grad_solver_convergence_check_frequency)
+        || opt.load_values("SourceVertices", source_vertices)
+        || opt.load_value("SolverType", solver_type))) {
       std::cerr << "Unable to parse option " << option_str << std::endl;
       return false;
     }
   }
 
-  if(!valid_parameters()){
+  if (!valid_parameters()) {
     std::cerr << "Error: invalid parameter value" << std::endl;
     return false;
   }
@@ -192,16 +227,15 @@ bool check_upper_bound(const std::string &name, T val, T upper_bound,
   return valid;
 }
 
-
-bool check_nonempty_index_sequence(const std::string &name, const std::vector<int> &seq)
-{
+bool check_nonempty_index_sequence(const std::string &name,
+                                   const std::vector<int> &seq) {
   bool valid = (!seq.empty());
-  if(!valid){
+  if (!valid) {
     std::cerr << "Error: " << name << " is empty" << std::endl;
   }
 
-  for(int i = 0; i < static_cast<int>(seq.size()); ++ i){
-    if(seq[i] < 0){
+  for (int i = 0; i < static_cast<int>(seq.size()); ++i) {
+    if (seq[i] < 0) {
       std::cerr << "Error: invalid index " << seq[i] << std::endl;
       valid = false;
       break;
@@ -211,22 +245,37 @@ bool check_nonempty_index_sequence(const std::string &name, const std::vector<in
   return valid;
 }
 
+bool check_solvertype(const std::string& name, int type) {
+  bool valid = (type == 0) || (type == 1);
+
+  if (!valid) {
+    std::cerr << "Error:" << name << " must be " << "0 or 1" << std::endl;
+    std::cout << "0 for Face Based Geodesic Solver \n"
+              << "1 for Edge Based Geodesic Solver \n";
+  }
+
+  return valid;
+}
+
 // Check whether the parameter values are valid
 bool Parameters::valid_parameters() const {
   return check_lower_bound("HeatSolverMaxIter", heat_solver_max_iter, 0, false)
       && check_lower_bound("HeatSolverEps", heat_solver_eps, 0.0, false)
-      && check_lower_bound("HeatSolverConvergeCheckFrequency", heat_solver_convergence_check_frequency, 0, false)
+      && check_lower_bound("HeatSolverConvergeCheckFrequency",
+                           heat_solver_convergence_check_frequency, 0, false)
       && check_lower_bound("GradSolverMaxIter", grad_solver_max_iter, 0, false)
       && check_lower_bound("GradSolverEps", grad_solver_eps, 0.0, false)
       && check_lower_bound("Penalty", penalty, 0.0, false)
-      && check_lower_bound("GradSolverOutputFrequency", grad_solver_output_frequency, 0, false)
-      && check_lower_bound("GradSolverConvergeCheckFrequency", grad_solver_convergence_check_frequency, 0, false)
-      && check_nonempty_index_sequence("SourceVertices", source_vertices);
+      && check_lower_bound("GradSolverOutputFrequency",
+                           grad_solver_output_frequency, 0, false)
+      && check_lower_bound("GradSolverConvergeCheckFrequency",
+                           grad_solver_convergence_check_frequency, 0, false)
+      && check_nonempty_index_sequence("SourceVertices", source_vertices)
+      && check_solvertype("SolverType", solver_type);
 }
 
 template<typename T>
-void print_value(const std::string &name, T value)
-{
+void print_value(const std::string &name, T value) {
   std::cout << name << ": " << value << std::endl;
 }
 
@@ -239,10 +288,20 @@ void Parameters::output_options() {
   print_value("Penalty", penalty);
 
   std::cout << "Source vertices: ";
-  for(int i = 0; i < static_cast<int>(this->source_vertices.size()); ++ i){
+  for (int i = 0; i < static_cast<int>(this->source_vertices.size()); ++i) {
     std::cout << source_vertices[i] << " ";
   }
   std::cout << std::endl;
 
   std::cout << "====================================" << std::endl;
+
+  std::cout << "======== Solver Algorithm ========" << std::endl;
+  if (solver_type == 0) {
+    std::cout << "Face Based Geodesic Distance Solver" << std::endl;
+  } else {
+    std::cout << "Edge Based Geodesic Distance Solver" << std::endl;
+  }
+
+  std::cout << "====================================" << std::endl;
+
 }

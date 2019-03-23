@@ -27,3 +27,6 @@ GradSolverOutputFrequency  50
 
 ## List of source vertices, separated by whitespace; must be non-negative
 SourceVertices  0
+
+## Solver Types, 0 for face-based solver, 1 for edge-based solver.
+SolverType 0
