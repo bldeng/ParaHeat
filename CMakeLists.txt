@@ -74,7 +74,7 @@ if(WITH_VIEWER)
 		message(FATAL_ERROR "Cannot find libigl in the external folder.")
 	endif()
 	
-	set(GLAD_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/libigl/external/glad")
+	set(GLAD_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/glad")
 	add_library(glad 
 		"${GLAD_PATH}/src/glad.c"
 	)
