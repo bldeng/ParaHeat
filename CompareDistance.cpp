@@ -49,7 +49,7 @@ void shift_and_normalize_distance(const std::vector<int> &source_vtx,
 }
 
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
+  if (argc != 4) {
     std::cerr
         << "Usage: CompareDistance PARAMETERS_FILE DISTANCE_FILE REFERENCE_DISTANCE_FILE"
         << std::endl;

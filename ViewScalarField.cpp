@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
   // Load scalar values
   Eigen::VectorXd scalar_vals;
-  if (DistanceFile::load(argv[2], scalar_vals)) {
+  if (!DistanceFile::load(argv[2], scalar_vals)) {
     std::cerr << "Error: unable to read scalar values from file " << argv[2]
               << std::endl;
   }
