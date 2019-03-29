@@ -28,7 +28,6 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include "FaceBasedGeodesicSolver.h"
 #include "surface_mesh/IO.h"
 #include "OMPHelper.h"
@@ -410,7 +409,12 @@ void FaceBasedGeodesicSolver::gauss_seidel_init_gradients() {
                 << eps << std::endl;
     }
 
-    while (!end_gs_loop) {
+  }
+
+  while (!end_gs_loop) {
+
+    OMP_PARALLEL
+    {
       // Gauss-Seidel update of heat values in breadth-first order
       OMP_SINGLE
       {
@@ -476,7 +480,10 @@ void FaceBasedGeodesicSolver::gauss_seidel_init_gradients() {
         }
       }
     }
+  }
 
+  OMP_PARALLEL
+  {
     OMP_SINGLE
     {
       temp_d.resize(0);

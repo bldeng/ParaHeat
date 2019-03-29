@@ -28,8 +28,6 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
 #include "EdgeBasedGeodesicSolver.h"
 #include "surface_mesh/IO.h"
 #include "OMPHelper.h"
@@ -40,14 +38,14 @@
 EdgeBasedGeodesicSolver::EdgeBasedGeodesicSolver()
     : model_scaling_factor(1.0),
       bfs_laplacian_coef(NULL),
-      need_compute_residual_norms(false),
-      prev_SX(NULL),
       current_SX(NULL),
+      prev_SX(NULL),
+      need_compute_residual_norms(false),
       n_vertices(0),
       n_faces(0),
       n_edges(0),
-      n_interior_edges(0),
       n_halfedges(0),
+      n_interior_edges(0),
       iter_num(0),
       primal_residual_sqr_norm(0),
       dual_residual_sqr_norm(0),
@@ -413,7 +411,11 @@ void EdgeBasedGeodesicSolver::gauss_seidel_init_gradients() {
                 << eps << std::endl;
     }
 
-    while (!end_gs_loop) {
+  }
+
+  while (!end_gs_loop) {
+    OMP_PARALLEL
+    {
       // Gauss-Seidel update of heat values in breadth-first order
       OMP_SINGLE
       {
@@ -479,7 +481,10 @@ void EdgeBasedGeodesicSolver::gauss_seidel_init_gradients() {
         }
       }
     }
+  }
 
+  OMP_PARALLEL
+  {
     OMP_SINGLE
     {
       temp_d.resize(0);
