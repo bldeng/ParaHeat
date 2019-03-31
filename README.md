@@ -7,14 +7,20 @@ This is the source code for the algorithms in the following paper:
 
 ### Compling the code
 
-1. The code implements the following three commands:
+1. The code has been tested on the following systems:
+
+	* Windows 10 with Microsoft Visual Studio Community 2017;
+	* macOS Mojave 10.14.3 with Xcode 10.1 and Homebrew GCC 8.1.0;
+	* Ubuntu 18.04 with GCC 7.3.0.
+
+2. The code implements the following three commands:
 
 	* `GeodDistSolver` for computing geodesic distance;
 	* `ViewScalarField` for visualizing the distance on a mesh;
 	* `CompareDistance` for computing mean relative error of the computed distance.
 
 
-2. The code requires [Eigen] (http://http://eigen.tuxfamily.org). 
+3. The code requires [Eigen] (http://http://eigen.tuxfamily.org). 
 	* On Ubuntu or Debian, this can be installed using the following command: 
 			
 			$ apt-get instal libeigen3-dev
@@ -26,7 +32,7 @@ This is the source code for the algorithms in the following paper:
 	* On Windows, you can download Eigen and extract it into the `external` folder. Make sure you rename the Eigen folder as `eigen`, so that you can locate the file `external/eigen/Eigen/Dense`.
 
 
-3. In addition, compiling `ViewScalarField` requires [libigl](https://libigl.github.io/), [Glad](https://glad.dav1d.de/), and [glfw](https://www.glfw.org/):
+4. In addition, compiling `ViewScalarField` requires [libigl](https://libigl.github.io/), [Glad](https://glad.dav1d.de/), and [glfw](https://www.glfw.org/):
 	* Download libigl from github, unzip it and rename the folder as `libigl`, and place it inside the `external` folder. Make sure you can locate the folder `external/libigl/include`.
 	* Download the Glad library (`glad.zip`) from its homepage, unzip and place it inside the `external` folder. Make sure you can locate the folders `external/glad/include` and `external/glad/src`.
 	* To install glfw: 
@@ -36,7 +42,7 @@ This is the source code for the algorithms in the following paper:
 	* Warning: the latest libigl library relies on features of glfw 3.3, and does not compile on older versions of glfw. To avoid compilation errors, you can disable `ViewScalarField` using the switch `WITH_VIEWER` during cmake configuration.
 
 
-4. After installing all the dependencies, use cmake to generate the project file and compile. Create a folder `build` within the root folder of source code, then run
+5. After installing all the dependencies, use cmake to generate the project file and compile. Create a folder `build` within the root folder of source code, then run
 
 	```
 	$ cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -45,7 +51,7 @@ This is the source code for the algorithms in the following paper:
 
 	If you use a cmake user interface (using the `ccmake` command for the curses interface, or using a GUI), you can turn on/off OpenMP support and the compilation of the viewer before compling the code.
 	
-	* The default compiler on macOS (Apple Clang from Xcode) does not support OpenMP. To achieve best performance, it is recommended to compile the code with Homebrew gcc. For example, if you create a build folder in the source code directory, then use the following command (assuming gcc-8 and g++-8 are installed by Homebrew)
+	* The default compiler on macOS (Apple Clang from Xcode) does not support OpenMP. To achieve best performance, it is recommended to compile the code with Homebrew GCC. For example, if you create a build folder in the source code directory, then use the following command (assuming gcc-8 and g++-8 are installed by Homebrew)
 		
 			$ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 ..
 
